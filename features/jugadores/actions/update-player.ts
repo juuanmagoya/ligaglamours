@@ -2,10 +2,12 @@
 
 import { updatePlayer } from "../services/player.service"
 import { revalidatePath } from "next/cache"
+import { AppUser } from "@/features/users/types/user.types"
 
 export async function updatePlayerAction(
   id: string,
-  formData: FormData
+  formData: FormData,
+  user: AppUser
 ) {
 
   const id_game = formData.get("id_game") as string
@@ -19,10 +21,19 @@ export async function updatePlayerAction(
     throw new Error("ID Game y Nickname son obligatorios")
   }
 
-  await updatePlayer(id, {
-    id_game,
-    nickname
-  })
+  await updatePlayer(
+    id,
+    {
+      id_game,
+      nickname
+    },
+    user
+  )
 
-  revalidatePath("/admin/players")
+  const path =
+    user.role === "admin"
+      ? "/admin/players"
+      : "/lider/players"
+
+  revalidatePath(path)
 }

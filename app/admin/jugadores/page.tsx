@@ -4,11 +4,15 @@ import { getTeams } from "@/features/equipos/services/equipo.service"
 import { PlayersHeader } from "@/features/jugadores/components/player-header"
 import { PlayerTable } from "@/features/jugadores/components/player-table"
 
+import { getCurrentUser } from "@/lib/auth/getCurrentUser"
+
 export default async function PlayersPage() {
 
-  const players = await getPlayers()
+  // 🔥 usuario centralizado
+  const user = await getCurrentUser()
 
-  const teams = await getTeams()
+  const players = await getPlayers()
+  const teams = await getTeams(user)
 
   return (
     <div className="p-6 space-y-6">

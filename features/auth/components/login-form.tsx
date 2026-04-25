@@ -27,6 +27,8 @@ export function LoginForm() {
       redirect: false
     })
 
+console.log(res)
+
     setLoading(false)
 
     if (res?.error) {
@@ -34,7 +36,7 @@ export function LoginForm() {
       return
     }
 
-    router.push("/dashboard")
+    router.push("/admin/dashboard")
   }
 
   return (
