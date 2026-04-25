@@ -1,52 +1,61 @@
-import NextAuth from "next-auth"
+import { AuthOptions } from "next-auth"
 import Credentials from "next-auth/providers/credentials"
 import bcrypt from "bcryptjs"
 
 import { supabase } from "@/lib/supabase/client"
 import { UserRole, UserStatus } from "@/features/users/types/user.types"
 
-export const { handlers, auth, signIn, signOut } = NextAuth({
-
+export const authOptions: AuthOptions = {
   providers: [
     Credentials({
-      name: "Credentials",
-
       credentials: {
-        email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" }
+        email: {},
+        password: {}
       },
 
       async authorize(credentials) {
 
-        if (!credentials?.email || !credentials?.password) {
-          return null
-        }
+  console.log("credentials:", credentials)
 
-        const { data: user, error } = await supabase
-          .from("users")
-          .select("*")
-          .eq("email", credentials.email)
-          .single()
+  if (!credentials?.email || !credentials?.password) {
+    console.log("faltan credenciales")
+    return null
+  }
 
-        if (error || !user) return null
+  const { data: user, error } = await supabase
+    .from("users")
+    .select("*")
+    .eq("email", credentials.email)
+    .single()
 
-        const isValidPassword = await bcrypt.compare(
-          credentials.password,
-          user.password
-        )
+  console.log("user:", user)
+  console.log("error:", error)
 
-        if (!isValidPassword) return null
+  if (!user) {
+    console.log("usuario no encontrado")
+    return null
+  }
 
-        if (user.status === "inactive") return null
+  const isValidPassword = await bcrypt.compare(
+    credentials.password as string,
+    user.password
+  )
 
-        return {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          role: user.role as UserRole,
-          status: user.status as UserStatus
-        }
-      }
+  console.log("password válida:", isValidPassword)
+
+  if (!isValidPassword) {
+    console.log("password incorrecta")
+    return null
+  }
+
+  return {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    status: user.status
+  }
+}
     })
   ],
 
@@ -55,7 +64,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
 
   callbacks: {
-
     async jwt({ token, user }) {
 
       if (user) {
@@ -77,7 +85,5 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
       return session
     }
-
   }
-
-})
+}

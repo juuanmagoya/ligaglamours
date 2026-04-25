@@ -5,10 +5,15 @@ import { getDivisions } from "@/features/divisiones/services/divisions.service"
 import { PositionsHeader } from "@/features/posiciones/components/position-header"
 import { PositionTable } from "@/features/posiciones/components/position-table"
 
+import { getCurrentUser } from "@/lib/auth/getCurrentUser"
+
 export default async function PositionsPage() {
 
+  // 🔥 usuario centralizado
+  const user = await getCurrentUser()
+
   const positions = await getPositions()
-  const teams = await getTeams()
+  const teams = await getTeams(user)
   const divisions = await getDivisions()
 
   return (

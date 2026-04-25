@@ -4,11 +4,15 @@ import { getTeams } from "@/features/equipos/services/equipo.service"
 import { LeadersHeader } from "@/features/lideres/components/leader-header"
 import { LeaderTable } from "@/features/lideres/components/leader-table"
 
+import { getCurrentUser } from "@/lib/auth/getCurrentUser"
+
 export default async function LeadersPage() {
 
-  const leaders = await getLeaders()
+  // 🔥 usuario centralizado
+  const user = await getCurrentUser()
 
-  const teams = await getTeams()
+  const leaders = await getLeaders()
+  const teams = await getTeams(user)
 
   return (
     <div className="p-6 space-y-6">

@@ -4,10 +4,14 @@ import { getDivisions } from "@/features/divisiones/services/divisions.service"
 import { TeamsHeader } from "@/features/equipos/components/team-header"
 import { TeamTable } from "@/features/equipos/components/team-table"
 
+import { getCurrentUser } from "@/lib/auth/getCurrentUser"
+
 export default async function TeamsPage() {
 
-  const teams = await getTeams()
+  // 🔥 usuario centralizado
+  const user = await getCurrentUser()
 
+  const teams = await getTeams(user)
   const divisions = await getDivisions()
 
   return (

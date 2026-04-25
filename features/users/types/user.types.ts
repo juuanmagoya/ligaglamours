@@ -8,4 +8,5 @@ export interface AppUser {
   email: string
   role: UserRole
   status: UserStatus
+  team_id?: string | null
 }
