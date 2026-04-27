@@ -19,6 +19,7 @@ import {
 } from "../schemas/equipo.schema"
 
 import { Team } from "../types/equipo.type"
+import { useSession } from "next-auth/react"
 
 type Props = {
   team?: Team
@@ -29,6 +30,11 @@ type Props = {
 export function TeamForm({ team, divisions, onSuccess }: Props) {
 
   const router = useRouter()
+  const { data: session } = useSession()
+
+  const role = session?.user?.role
+
+  const isLeader = role === "leader"
 
   const form = useForm<TeamFormValues>({
     resolver: zodResolver(teamSchema),
@@ -51,12 +57,12 @@ export function TeamForm({ team, divisions, onSuccess }: Props) {
 
   const name = watch("name")
 
-  // generar slug automático
+  // generar slug automático SOLO si es creación y admin
   useEffect(() => {
-    if (!team && name) {
+    if (!team && name && !isLeader) {
       setValue("slug", slugify(name))
     }
-  }, [name, setValue, team])
+  }, [name, setValue, team, isLeader])
 
   async function onSubmit(
     data: TeamFormValues,
@@ -66,35 +72,25 @@ export function TeamForm({ team, divisions, onSuccess }: Props) {
 
       const formData = new FormData()
 
-      formData.append("name", data.name)
-      formData.append("slug", data.slug)
-      formData.append("division_id", data.division_id)
+      // 🔒 ADMIN puede mandar todo
+      if (!isLeader) {
+        formData.append("name", data.name)
+        formData.append("slug", data.slug)
+        formData.append("division_id", data.division_id)
+      }
 
       const formEl = e?.target as HTMLFormElement
       const fileInput = formEl.querySelector(
         'input[name="logo"]'
-      ) as HTMLInputElement
+      ) as HTMLInputElement | null
 
-      const file = fileInput?.files?.[0]
+      const file = fileInput?.files?.[0] ?? null
 
-      console.log("🧪 file detectado:", file)
-
-      let logo_url = null
+      let logo_url: string | null = null
 
       if (file) {
-
-        console.log("📦 tamaño original:", (file.size / 1024).toFixed(2), "KB")
-
-        // 🔥 COMPRESIÓN
         const compressedFile = await compressImage(file)
-
-        console.log("📦 tamaño comprimido:", (compressedFile.size / 1024).toFixed(2), "KB")
-
-        console.log("🚀 subiendo imagen comprimida...")
-
         logo_url = await uploadTeamLogo(compressedFile)
-
-        console.log("✅ url obtenida:", logo_url)
       }
 
       if (logo_url) {
@@ -103,6 +99,7 @@ export function TeamForm({ team, divisions, onSuccess }: Props) {
         formData.append("logo_url", team.logo_url)
       }
 
+      // 🔒 Leader solo puede esto
       if (data.description) {
         formData.append("description", data.description)
       }
@@ -118,9 +115,14 @@ export function TeamForm({ team, divisions, onSuccess }: Props) {
       router.refresh()
       onSuccess?.()
 
-    } catch (error: any) {
-      console.error(error)
-      toast.error(error.message || "Error guardando el equipo")
+    } catch (error: unknown) {
+
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Error guardando el equipo"
+
+      toast.error(message)
     }
   }
 
@@ -138,8 +140,9 @@ export function TeamForm({ team, divisions, onSuccess }: Props) {
 
         <input
           {...register("name")}
+          disabled={isLeader}
           className="w-full mt-1 border border-gray-300 rounded-md px-3 py-2
-          focus:outline-none focus:ring-2 focus:ring-purple-500"
+          focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:bg-gray-100"
         />
 
         {errors.name && (
@@ -157,8 +160,9 @@ export function TeamForm({ team, divisions, onSuccess }: Props) {
 
         <input
           {...register("slug")}
+          disabled={isLeader}
           className="w-full mt-1 border border-gray-300 rounded-md px-3 py-2
-          focus:outline-none focus:ring-2 focus:ring-purple-500"
+          focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:bg-gray-100"
         />
 
         {errors.slug && (
@@ -176,8 +180,9 @@ export function TeamForm({ team, divisions, onSuccess }: Props) {
 
         <select
           {...register("division_id")}
+          disabled={isLeader}
           className="w-full mt-1 border border-gray-300 rounded-md px-3 py-2
-          focus:outline-none focus:ring-2 focus:ring-purple-500"
+          focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:bg-gray-100"
         >
           <option value="">Seleccionar división</option>
 
@@ -189,7 +194,6 @@ export function TeamForm({ team, divisions, onSuccess }: Props) {
               {division.name}
             </option>
           ))}
-
         </select>
 
         {errors.division_id && (
