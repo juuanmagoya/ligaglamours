@@ -1,6 +1,6 @@
 "use client"
 
-import { signIn } from "next-auth/react"
+import { getSession, signIn } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { Eye, EyeOff } from "lucide-react"
@@ -16,28 +16,33 @@ export function LoginForm() {
   const [loading, setLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-    setError("")
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault()
+  setLoading(true)
+  setError("")
 
-    const res = await signIn("credentials", {
-      email,
-      password,
-      redirect: false
-    })
+  const res = await signIn("credentials", {
+    email,
+    password,
+    redirect: false
+  })
 
-console.log(res)
+  setLoading(false)
 
-    setLoading(false)
-
-    if (res?.error) {
-      setError("Email o contraseña incorrectos")
-      return
-    }
-
-    router.push("/admin/dashboard")
+  if (res?.error) {
+    setError("Email o contraseña incorrectos")
+    return
   }
+
+  // 🔥 obtener sesión real
+  const session = await getSession()
+
+  if (session?.user?.role === "admin") {
+    router.push("/admin/dashboard")
+  } else if (session?.user?.role === "leader") {
+    router.push("/lider/equipo")
+  }
+}
 
   return (
     <div className="w-full">

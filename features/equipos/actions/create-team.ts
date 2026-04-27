@@ -2,12 +2,11 @@
 
 import { createTeam } from "../services/equipo.service"
 import { revalidatePath } from "next/cache"
-import { AppUser } from "@/features/users/types/user.types"
+import { getCurrentUser } from "@/lib/auth/getCurrentUser"
 
-export async function createTeamAction(
-  formData: FormData,
-  user: AppUser
-) {
+export async function createTeamAction(formData: FormData) {
+
+  const user = await getCurrentUser() // 🔥 CLAVE
 
   const name = formData.get("name") as string
   const slug = formData.get("slug") as string
@@ -30,10 +29,5 @@ export async function createTeamAction(
     user
   )
 
-  const path =
-    user.role === "admin"
-      ? "/admin/teams"
-      : "/lider/team"
-
-  revalidatePath(path)
+  revalidatePath("/admin/equipos")
 }
