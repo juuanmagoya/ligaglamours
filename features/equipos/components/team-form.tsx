@@ -10,6 +10,8 @@ import { slugify } from "@/lib/slugify"
 
 import { createTeamAction } from "../actions/create-team"
 import { updateTeamAction } from "../actions/update-team"
+import { uploadTeamLogo } from "../utils/upload-logo"
+import { compressImage } from "@/lib/utils/image"
 
 import {
   teamSchema,
@@ -56,8 +58,10 @@ export function TeamForm({ team, divisions, onSuccess }: Props) {
     }
   }, [name, setValue, team])
 
-  async function onSubmit(data: TeamFormValues) {
-
+  async function onSubmit(
+    data: TeamFormValues,
+    e?: React.BaseSyntheticEvent
+  ) {
     try {
 
       const formData = new FormData()
@@ -66,8 +70,37 @@ export function TeamForm({ team, divisions, onSuccess }: Props) {
       formData.append("slug", data.slug)
       formData.append("division_id", data.division_id)
 
-      if (data.logo_url) {
-        formData.append("logo_url", data.logo_url)
+      const formEl = e?.target as HTMLFormElement
+      const fileInput = formEl.querySelector(
+        'input[name="logo"]'
+      ) as HTMLInputElement
+
+      const file = fileInput?.files?.[0]
+
+      console.log("🧪 file detectado:", file)
+
+      let logo_url = null
+
+      if (file) {
+
+        console.log("📦 tamaño original:", (file.size / 1024).toFixed(2), "KB")
+
+        // 🔥 COMPRESIÓN
+        const compressedFile = await compressImage(file)
+
+        console.log("📦 tamaño comprimido:", (compressedFile.size / 1024).toFixed(2), "KB")
+
+        console.log("🚀 subiendo imagen comprimida...")
+
+        logo_url = await uploadTeamLogo(compressedFile)
+
+        console.log("✅ url obtenida:", logo_url)
+      }
+
+      if (logo_url) {
+        formData.append("logo_url", logo_url)
+      } else if (team?.logo_url) {
+        formData.append("logo_url", team.logo_url)
       }
 
       if (data.description) {
@@ -75,29 +108,20 @@ export function TeamForm({ team, divisions, onSuccess }: Props) {
       }
 
       if (team) {
-
         await updateTeamAction(team.id, formData)
-
         toast.success("Equipo actualizado")
-
       } else {
-
         await createTeamAction(formData)
-
         toast.success("Equipo creado correctamente")
-
       }
 
       router.refresh()
-
       onSuccess?.()
 
-    } catch {
-
-      toast.error("Error guardando el equipo")
-
+    } catch (error: any) {
+      console.error(error)
+      toast.error(error.message || "Error guardando el equipo")
     }
-
   }
 
   return (
@@ -175,24 +199,18 @@ export function TeamForm({ team, divisions, onSuccess }: Props) {
         )}
       </div>
 
-      {/* Logo URL */}
+      {/* Logo */}
       <div>
         <label className="text-sm font-medium text-gray-700">
-          Logo URL
+          Logo
         </label>
 
         <input
-          {...register("logo_url")}
-          placeholder="https://..."
-          className="w-full mt-1 border border-gray-300 rounded-md px-3 py-2
-          focus:outline-none focus:ring-2 focus:ring-purple-500"
+          type="file"
+          name="logo"
+          accept="image/*"
+          className="w-full mt-1"
         />
-
-        {errors.logo_url && (
-          <p className="text-sm text-red-500 mt-1">
-            {errors.logo_url.message}
-          </p>
-        )}
       </div>
 
       {/* Descripción */}

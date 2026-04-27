@@ -2,13 +2,14 @@
 
 import { updateTeam } from "../services/equipo.service"
 import { revalidatePath } from "next/cache"
-import { AppUser } from "@/features/users/types/user.types"
+import { getCurrentUser } from "@/lib/auth/getCurrentUser"
 
 export async function updateTeamAction(
   id: string,
-  formData: FormData,
-  user: AppUser
+  formData: FormData
 ) {
+
+  const user = await getCurrentUser() // 🔥 CLAVE
 
   if (!id) {
     throw new Error("ID de equipo requerido")
@@ -32,10 +33,5 @@ export async function updateTeamAction(
     user
   )
 
-  const path =
-    user.role === "admin"
-      ? "/admin/teams"
-      : "/lider/team"
-
-  revalidatePath(path)
+  revalidatePath("/admin/equipos")
 }

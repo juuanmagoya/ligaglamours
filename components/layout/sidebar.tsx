@@ -2,7 +2,15 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Shield, Crown, X } from "lucide-react";
+import {
+  Home,
+  Shield,
+  Crown,
+  X,
+  LogOut,
+  Users,
+} from "lucide-react";
+import { signOut, useSession } from "next-auth/react";
 
 export default function Sidebar({
   open,
@@ -12,6 +20,9 @@ export default function Sidebar({
   setOpen: (value: boolean) => void;
 }) {
   const pathname = usePathname();
+  const { data: session, status } = useSession();
+
+  const role = session?.user?.role;
 
   const linkClass = (path: string) =>
     `flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors
@@ -20,6 +31,29 @@ export default function Sidebar({
         ? "bg-purple-600 text-white"
         : "text-gray-300 hover:bg-purple-700 hover:text-white"
     }`;
+
+  // 🔥 MENÚS
+  const adminLinks = [
+    { href: "/admin/dashboard", label: "Dashboard", icon: Home },
+    { href: "/admin/equipos", label: "Equipos", icon: Shield },
+    { href: "/admin/lideres", label: "Líderes", icon: Crown },
+    { href: "/admin/divisiones", label: "Divisiones", icon: Crown },
+    { href: "/admin/jugadores", label: "Jugadores", icon: Users },
+    { href: "/admin/posiciones", label: "Posiciones", icon: Crown },
+  ];
+
+  const leaderLinks = [
+    { href: "/lider/equipo", label: "Mi Equipo", icon: Shield },
+    { href: "/lider/jugadores", label: "Mis Jugadores", icon: Users },
+  ];
+
+  // 🔥 EVITA FALLBACK INCORRECTO
+  const links =
+    role === "admin"
+      ? adminLinks
+      : role === "leader"
+      ? leaderLinks
+      : [];
 
   return (
     <>
@@ -60,58 +94,54 @@ export default function Sidebar({
           </button>
         </div>
 
-        {/* navegación */}
+        {/* 👤 USER INFO */}
+        <div className="mb-6 p-3 rounded-lg bg-purple-900/40 border border-purple-700">
+          <p className="text-sm font-semibold">
+            {status === "loading"
+              ? "Cargando..."
+              : session?.user?.name || "Usuario"}
+          </p>
+          <p className="text-xs text-purple-300 capitalize">
+            {status === "loading"
+              ? "..."
+              : role || "rol"}
+          </p>
+        </div>
+
+        {/* 🔗 NAV */}
         <nav className="flex flex-col gap-2">
+          {status === "loading" ? (
+            <p className="text-gray-400 text-sm px-3">Cargando menú...</p>
+          ) : (
+            links.map((link) => {
+              const Icon = link.icon;
 
-          <Link
-            href="/admin/dashboard"
-            className={linkClass("/admin/dashboard")}
-          >
-            <Home size={18} />
-            Dashboard
-          </Link>
-
-          <Link
-            href="/admin/equipos"
-            className={linkClass("/admin/equipos")}
-          >
-            <Shield size={18} />
-            Equipos
-          </Link>
-
-          <Link
-            href="/admin/lideres"
-            className={linkClass("/admin/lideres")}
-          >
-            <Crown size={18} />
-            Líderes
-          </Link>
-
-          <Link
-            href="/admin/divisiones"
-            className={linkClass("/admin/divisiones")}
-          >
-            <Crown size={18} />
-            Divisiones
-          </Link>
-
-          <Link
-            href="/admin/jugadores"
-            className={linkClass("/admin/jugadores")}
-          >
-            <Crown size={18} />
-            Jugadores
-          </Link>
-
-          <Link
-            href="/admin/posiciones"
-            className={linkClass("/admin/posiciones")}
-          >
-            <Crown size={18} />
-            Posiciones
-          </Link>
-
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={linkClass(link.href)}
+                >
+                  <Icon size={18} />
+                  {link.label}
+                </Link>
+              );
+            })
+          )}
         </nav>
+
+        {/* 🚪 LOGOUT */}
+        {status !== "loading" && (
+          <div className="mt-10">
+            <button
+              onClick={() => signOut({ callbackUrl: "/login" })}
+              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-red-400 hover:bg-red-600 hover:text-white transition-colors"
+            >
+              <LogOut size={18} />
+              Cerrar sesión
+            </button>
+          </div>
+        )}
       </aside>
     </>
   );
