@@ -4,9 +4,13 @@ import { PlayerRow } from "./player-row"
 type Props = {
   players: Player[]
   teams: { id: string; name: string }[]
+  user: {
+    role: "admin" | "leader"
+    team_id?: string | null
+  }
 }
 
-export function PlayerTable({ players, teams }: Props) {
+export function PlayerTable({ players, teams, user }: Props) {
   return (
     <div className="rounded-xl border border-purple-200 bg-white/80 backdrop-blur">
 
@@ -40,6 +44,7 @@ export function PlayerTable({ players, teams }: Props) {
               key={player.id}
               player={player}
               teams={teams}
+              user={user}
             />
           ))}
         </tbody>

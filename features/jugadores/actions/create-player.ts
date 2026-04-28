@@ -2,12 +2,12 @@
 
 import { createPlayer } from "../services/player.service"
 import { revalidatePath } from "next/cache"
-import { AppUser } from "@/features/users/types/user.types"
+import { getCurrentUser } from "@/lib/auth/getCurrentUser"
 
 export async function createPlayerAction(
-  formData: FormData,
-  user: AppUser
+  formData: FormData
 ) {
+  const user = await getCurrentUser() // 🔥 acá
 
   const id_game = formData.get("id_game") as string
   const nickname = formData.get("nickname") as string
@@ -34,7 +34,7 @@ export async function createPlayerAction(
   const path =
     user.role === "admin"
       ? "/admin/players"
-      : "/lider/players"
+      : "/leader/players" // 🔥 ojo typo que tenías
 
   revalidatePath(path)
 }

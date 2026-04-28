@@ -11,19 +11,21 @@ export default async function PlayersPage() {
   // 🔐 usuario autenticado
   const user = await getCurrentUser()
 
-  // 🔥 ahora SI pasa user
+  // 🔥 jugadores filtrados automáticamente por el service
   const players = await getPlayers(user)
 
+  // 📦 equipos del líder (en tu caso probablemente uno solo)
   const teams = await getTeams(user)
 
   return (
     <div className="p-6 space-y-6">
 
-      <PlayersHeader teams={teams} />
+      <PlayersHeader teams={teams} user={user} />
 
       <PlayerTable
         players={players}
         teams={teams}
+        user={user} // 🔥 CLAVE
       />
 
     </div>

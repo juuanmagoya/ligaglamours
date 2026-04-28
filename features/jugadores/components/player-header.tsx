@@ -7,9 +7,13 @@ import { PlayerForm } from "./player-form"
 
 type Props = {
   teams: { id: string; name: string }[]
+  user: {
+    role: "admin" | "leader"
+    team_id?: string | null
+  }
 }
 
-export function PlayersHeader({ teams }: Props) {
+export function PlayersHeader({ teams, user }: Props) {
   return (
     <div className="flex items-center justify-between">
 
@@ -35,6 +39,7 @@ export function PlayersHeader({ teams }: Props) {
           <PlayerForm
             teams={teams}
             onSuccess={close}
+            user={user}
           />
         )}
       </Modal>

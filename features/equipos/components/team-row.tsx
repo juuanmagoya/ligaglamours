@@ -3,6 +3,7 @@
 import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
+import { useSession } from "next-auth/react"
 
 import { Team } from "../types/equipo.type"
 
@@ -23,20 +24,18 @@ type Props = {
 export function TeamRow({ team, divisions }: Props) {
 
   const router = useRouter()
+  const { data: session } = useSession()
+
+  const role = session?.user?.role
+  const isLeader = role === "leader"
 
   async function handleDelete() {
     try {
-
       await deleteTeamAction(team.id)
-
       toast.success("Equipo eliminado")
-
       router.refresh()
-
     } catch {
-
       toast.error("Error eliminando equipo")
-
     }
   }
 
@@ -82,7 +81,7 @@ export function TeamRow({ team, divisions }: Props) {
       <td className="p-4">
         <div className="flex items-center gap-2">
 
-          {/* Editar */}
+          {/* Editar (permitido para ambos, backend ya controla qué puede modificar) */}
           <Modal
             title="Editar equipo"
             trigger={<EditButton />}
@@ -99,14 +98,16 @@ export function TeamRow({ team, divisions }: Props) {
             )}
           </Modal>
 
-          {/* Eliminar */}
-          <ConfirmDialog
-            title="Eliminar equipo"
-            description="Esta acción no se puede deshacer"
-            onConfirm={handleDelete}
-          >
-            <DeleteButton />
-          </ConfirmDialog>
+          {/* ❌ Eliminar SOLO admin */}
+          {!isLeader && (
+            <ConfirmDialog
+              title="Eliminar equipo"
+              description="Esta acción no se puede deshacer"
+              onConfirm={handleDelete}
+            >
+              <DeleteButton />
+            </ConfirmDialog>
+          )}
 
         </div>
       </td>
