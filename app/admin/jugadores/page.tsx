@@ -19,11 +19,12 @@ export default async function PlayersPage() {
   return (
     <div className="p-6 space-y-6">
 
-      <PlayersHeader teams={teams} />
+      <PlayersHeader teams={teams} user={user} />
 
       <PlayerTable
         players={players}
         teams={teams}
+        user={user}
       />
 
     </div>
