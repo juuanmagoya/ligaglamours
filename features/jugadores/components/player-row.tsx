@@ -11,31 +11,28 @@ import { ConfirmDialog } from "@/components/ui/confirm-dialog"
 import { Modal } from "@/components/ui/modal"
 
 import { PlayerForm } from "./player-form"
-
 import { deletePlayerAction } from "../actions/delete-player"
 
 type Props = {
   player: Player
   teams: { id: string; name: string }[]
+  user: {
+    role: "admin" | "leader"
+    team_id?: string | null
+  }
 }
 
-export function PlayerRow({ player, teams }: Props) {
+export function PlayerRow({ player, teams, user }: Props) {
 
   const router = useRouter()
 
   async function handleDelete() {
     try {
-
       await deletePlayerAction(player.id)
-
       toast.success("Jugador eliminado")
-
       router.refresh()
-
     } catch {
-
       toast.error("Error eliminando jugador")
-
     }
   }
 
@@ -73,6 +70,7 @@ export function PlayerRow({ player, teams }: Props) {
               <PlayerForm
                 player={player}
                 teams={teams}
+                user={user} // 🔥 CLAVE
                 onSuccess={() => {
                   close()
                   router.refresh()

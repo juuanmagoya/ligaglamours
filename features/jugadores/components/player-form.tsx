@@ -18,12 +18,23 @@ import { Player } from "../types/player.type"
 type Props = {
   player?: Player
   teams: { id: string; name: string }[]
-  onSuccess?: () => void
+  user: {
+    role: "admin" | "leader"
+    team_id?: string | null
+  }
+  onSuccess?: () => void // 🔥 FALTABA
 }
 
-export function PlayerForm({ player, teams, onSuccess }: Props) {
+function isWeekend() {
+  const day = new Date().getDay()
+  return day === 0 || day === 6
+}
+
+export function PlayerForm({ player, teams, user, onSuccess }: Props) {
 
   const router = useRouter()
+
+  const canEdit = user.role === "admin" || isWeekend()
 
   const form = useForm<PlayerFormValues>({
     resolver: zodResolver(playerSchema),
@@ -42,6 +53,11 @@ export function PlayerForm({ player, teams, onSuccess }: Props) {
 
   async function onSubmit(data: PlayerFormValues) {
 
+    if (!canEdit) {
+      toast.error("Solo pueden crear o modificar jugadores los fines de semana.")
+      return
+    }
+
     try {
 
       const formData = new FormData()
@@ -49,34 +65,25 @@ export function PlayerForm({ player, teams, onSuccess }: Props) {
       formData.append("nickname", data.nickname)
       formData.append("id_game", data.id_game)
 
-      if (data.team_id) {
+      // 🔥 SOLO ADMIN ENVÍA TEAM
+      if (user.role === "admin" && data.team_id) {
         formData.append("team_id", data.team_id)
       }
 
       if (player) {
-
         await updatePlayerAction(player.id, formData)
-
         toast.success("Jugador actualizado")
-
       } else {
-
         await createPlayerAction(formData)
-
         toast.success("Jugador creado correctamente")
-
       }
 
       router.refresh()
-
       onSuccess?.()
 
     } catch {
-
       toast.error("Error guardando el jugador")
-
     }
-
   }
 
   return (
@@ -84,6 +91,13 @@ export function PlayerForm({ player, teams, onSuccess }: Props) {
       onSubmit={handleSubmit(onSubmit)}
       className="space-y-4"
     >
+
+      {/* 🚨 MENSAJE */}
+      {!canEdit && user.role === "leader" && (
+        <div className="bg-yellow-100 text-yellow-800 p-3 rounded-md text-sm">
+          Solo pueden crear o modificar jugadores los fines de semana.
+        </div>
+      )}
 
       {/* Nickname */}
       <div>
@@ -93,8 +107,9 @@ export function PlayerForm({ player, teams, onSuccess }: Props) {
 
         <input
           {...register("nickname")}
+          disabled={!canEdit}
           className="w-full mt-1 border border-gray-300 rounded-md px-3 py-2
-          focus:outline-none focus:ring-2 focus:ring-purple-500"
+          focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50"
         />
 
         {errors.nickname && (
@@ -112,8 +127,9 @@ export function PlayerForm({ player, teams, onSuccess }: Props) {
 
         <input
           {...register("id_game")}
+          disabled={!canEdit}
           className="w-full mt-1 border border-gray-300 rounded-md px-3 py-2
-          focus:outline-none focus:ring-2 focus:ring-purple-500"
+          focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50"
         />
 
         {errors.id_game && (
@@ -123,43 +139,44 @@ export function PlayerForm({ player, teams, onSuccess }: Props) {
         )}
       </div>
 
-      {/* Equipo */}
-      <div>
-        <label className="text-sm font-medium text-gray-700">
-          Equipo
-        </label>
+      {/* 🔥 SOLO ADMIN VE SELECT */}
+      {user.role === "admin" && (
+        <div>
+          <label className="text-sm font-medium text-gray-700">
+            Equipo
+          </label>
 
-        <select
-          {...register("team_id")}
-          className="w-full mt-1 border border-gray-300 rounded-md px-3 py-2
-          focus:outline-none focus:ring-2 focus:ring-purple-500"
-        >
+          <select
+            {...register("team_id")}
+            disabled={!canEdit}
+            className="w-full mt-1 border border-gray-300 rounded-md px-3 py-2
+            focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50"
+          >
 
-          <option value="">
-            Sin equipo
-          </option>
-
-          {teams.map((team) => (
-            <option
-              key={team.id}
-              value={team.id}
-            >
-              {team.name}
+            <option value="">
+              Sin equipo
             </option>
-          ))}
 
-        </select>
+            {teams.map((team) => (
+              <option key={team.id} value={team.id}>
+                {team.name}
+              </option>
+            ))}
 
-        {errors.team_id && (
-          <p className="text-sm text-red-500 mt-1">
-            {errors.team_id.message}
-          </p>
-        )}
-      </div>
+          </select>
 
+          {errors.team_id && (
+            <p className="text-sm text-red-500 mt-1">
+              {errors.team_id.message}
+            </p>
+          )}
+        </div>
+      )}
+
+      {/* Botón */}
       <button
         type="submit"
-        disabled={isSubmitting}
+        disabled={isSubmitting || !canEdit}
         className="w-full bg-purple-600 text-white py-2 rounded-md
         hover:bg-purple-700 transition disabled:opacity-50"
       >

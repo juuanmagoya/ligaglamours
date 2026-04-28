@@ -2,12 +2,11 @@
 
 import { deletePlayer } from "../services/player.service"
 import { revalidatePath } from "next/cache"
-import { AppUser } from "@/features/users/types/user.types"
+import { getCurrentUser } from "@/lib/auth/getCurrentUser"
 
-export async function deletePlayerAction(
-  id: string,
-  user: AppUser
-) {
+export async function deletePlayerAction(id: string) {
+
+  const user = await getCurrentUser()
 
   if (!id) {
     throw new Error("ID inválido")
@@ -18,7 +17,7 @@ export async function deletePlayerAction(
   const path =
     user.role === "admin"
       ? "/admin/players"
-      : "/lider/players"
+      : "/leader/players"
 
   revalidatePath(path)
 }

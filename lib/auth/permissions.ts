@@ -1,4 +1,4 @@
-// Tipos base (ajustalos a tu modelo real)
+// Tipos base
 type Role = "admin" | "leader"
 
 interface User {
@@ -15,21 +15,34 @@ interface Team {
  * 🧠 TEAM PERMISSIONS
  */
 
-// Puede ver el equipo
 export function canViewTeam(user: User, team: Team): boolean {
-  if (user.role === "admin") return true
+  const result =
+    user.role === "admin" ||
+    (user.role === "leader" && user.team_id === team.id)
 
-  return user.role === "leader" && user.team_id === team.id
+  console.log("🔍 canViewTeam", {
+    user,
+    team,
+    result
+  })
+
+  return result
 }
 
-// Puede editar el equipo (a nivel general)
 export function canEditTeam(user: User, team: Team): boolean {
-  if (user.role === "admin") return true
+  const result =
+    user.role === "admin" ||
+    (user.role === "leader" && user.team_id === team.id)
 
-  return user.role === "leader" && user.team_id === team.id
+  console.log("🔍 canEditTeam", {
+    user,
+    team,
+    result
+  })
+
+  return result
 }
 
-// Qué campos puede editar
 export function getEditableTeamFields(user: User): "all" | string[] {
   if (user.role === "admin") return "all"
 
@@ -40,38 +53,101 @@ export function getEditableTeamFields(user: User): "all" | string[] {
   return []
 }
 
-
 /**
  * 🧠 PLAYER PERMISSIONS
  */
 
-// Puede ver jugadores
+// 👁️ Puede ver jugadores
 export function canViewPlayers(user: User, teamId: string): boolean {
-  if (user.role === "admin") return true
+  const result =
+    user.role === "admin" ||
+    (user.role === "leader" && user.team_id === teamId)
 
-  return user.role === "leader" && user.team_id === teamId
+  console.log("🔍 canViewPlayers", {
+    userRole: user.role,
+    userTeam: user.team_id,
+    teamId,
+    result
+  })
+
+  return result
 }
 
-// Puede gestionar jugadores (sin considerar día)
+// ⚙️ Puede gestionar jugadores (sin día)
 export function canManagePlayers(user: User, teamId: string): boolean {
-  if (user.role === "admin") return true
+  const result =
+    user.role === "admin" ||
+    (user.role === "leader" && user.team_id === teamId)
 
-  return user.role === "leader" && user.team_id === teamId
+  console.log("🔍 canManagePlayers", {
+    userRole: user.role,
+    userTeam: user.team_id,
+    teamId,
+    match: user.team_id === teamId,
+    result
+  })
+
+  return result
 }
 
-// Restricción por día (sábado = 6, domingo = 0)
+// 📅 Día permitido
 export function isWeekend(): boolean {
-  const day = new Date().getDay()
-  return day === 0 || day === 6
+  const now = new Date()
+
+  // 🔥 timezone Argentina (clave)
+  const argentinaDate = new Date(
+    now.toLocaleString("en-US", {
+      timeZone: "America/Argentina/Buenos_Aires"
+    })
+  )
+
+  const day = argentinaDate.getDay()
+
+  const result = day === 0 || day === 6
+
+  console.log("📅 isWeekend", {
+    serverDate: now,
+    argentinaDate,
+    day,
+    isAllowed: result
+  })
+
+  return result
 }
 
-// Puede modificar jugadores (REGLA COMPLETA)
+// 🧠 REGLA COMPLETA
 export function canModifyPlayers(user: User, teamId: string): boolean {
-  if (!canManagePlayers(user, teamId)) return false
 
-  // Admin puede siempre
-  if (user.role === "admin") return true
+  console.log("🚨 canModifyPlayers START", {
+    user,
+    teamId
+  })
 
-  // Leader solo fines de semana
-  return isWeekend()
+  // ❗ sanity check
+  if (user.role === "leader" && !user.team_id) {
+    console.log("❌ Leader sin team_id")
+    return false
+  }
+
+  const canManage = canManagePlayers(user, teamId)
+
+  if (!canManage) {
+    console.log("❌ No puede gestionar jugadores")
+    return false
+  }
+
+  if (user.role === "admin") {
+    console.log("✅ Admin bypass total")
+    return true
+  }
+
+  const weekend = isWeekend()
+
+  console.log("🔍 canModifyPlayers RESULT", {
+    canManage,
+    weekend,
+    final: weekend
+  })
+
+  return weekend
 }

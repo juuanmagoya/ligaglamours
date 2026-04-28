@@ -3,12 +3,20 @@ import { Player, CreatePlayerDTO, UpdatePlayerDTO } from "../types/player.type"
 import { canModifyPlayers } from "@/lib/auth/permissions"
 import { AppUser } from "@/features/users/types/user.types"
 
-export async function getPlayers(): Promise<Player[]> {
+// ✅ GET PLAYERS SEGÚN ROL
+export async function getPlayers(user: AppUser): Promise<Player[]> {
 
-  const { data, error } = await supabase
+  let query = supabase
     .from("players")
     .select("*")
     .order("created_at", { ascending: false })
+
+  // 🔒 Si es líder → solo ve los suyos
+  if (user.role === "leader") {
+    query = query.eq("team_id", user.team_id!)
+  }
+
+  const { data, error } = await query
 
   if (error) {
     throw new Error(error.message)
@@ -17,17 +25,18 @@ export async function getPlayers(): Promise<Player[]> {
   return data as Player[]
 }
 
+
+// ✅ CREATE PLAYER
 export async function createPlayer(
   data: CreatePlayerDTO,
   user: AppUser
 ) {
 
-  // 🔒 Leader no puede elegir team_id
+  // 🔒 Leader no elige team
   if (user.role === "leader") {
     data.team_id = user.team_id!
   }
 
-  // 🔒 Validación permisos (incluye fin de semana)
   if (!canModifyPlayers(user, data.team_id!)) {
     throw new Error("No autorizado para crear jugadores")
   }
@@ -41,13 +50,14 @@ export async function createPlayer(
   }
 }
 
+
+// ✅ UPDATE PLAYER
 export async function updatePlayer(
   id: string,
   data: UpdatePlayerDTO,
   user: AppUser
 ) {
 
-  // 🔍 Obtener team real del player
   const { data: existing, error: fetchError } = await supabase
     .from("players")
     .select("team_id")
@@ -58,7 +68,11 @@ export async function updatePlayer(
     throw new Error("Jugador no encontrado")
   }
 
-  // 🔒 Validar contra team REAL
+  // 🔒 líder no puede cambiar de equipo
+  if (user.role === "leader") {
+    data.team_id = existing.team_id
+  }
+
   if (!canModifyPlayers(user, existing.team_id)) {
     throw new Error("No autorizado para actualizar jugadores")
   }
@@ -73,6 +87,8 @@ export async function updatePlayer(
   }
 }
 
+
+// ✅ DELETE PLAYER
 export async function deletePlayer(
   id: string,
   user: AppUser
