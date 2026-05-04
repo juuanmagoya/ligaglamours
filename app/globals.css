@@ -127,3 +127,10 @@
     @apply font-sans;
     }
 }
+
+html {
+  scroll-behavior: smooth;
+}
+section {
+  scroll-margin-top: 100px;
+}
