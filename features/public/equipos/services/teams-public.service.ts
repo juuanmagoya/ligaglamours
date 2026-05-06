@@ -1,8 +1,8 @@
+// teams-public.service.ts
 import { supabase } from "@/lib/supabase/client"
 import { TeamWithRelations } from "@/features/equipos/types/equipo.type"
 
 export async function getTeamsWithPlayers(): Promise<TeamWithRelations[]> {
-
   const { data, error } = await supabase
     .from("teams")
     .select(`
@@ -18,12 +18,11 @@ export async function getTeamsWithPlayers(): Promise<TeamWithRelations[]> {
     throw new Error(error.message)
   }
 
-    return (data ?? []).map(team => ({
+  // Transformar los datos para garantizar que divisions siempre sea un array
+  return (data ?? []).map(team => ({
     ...team,
-    divisions: Array.isArray(team.divisions)
-        ? team.divisions
-        : team.divisions
-        ? [team.divisions]
-        : []
-    })) as TeamWithRelations[]
+    divisions: team.divisions 
+      ? (Array.isArray(team.divisions) ? team.divisions : [team.divisions])
+      : []
+  })) as TeamWithRelations[]
 }

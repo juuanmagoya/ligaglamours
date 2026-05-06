@@ -12,32 +12,18 @@ type Props = {
 }
 
 export function TeamsView({ teams }: Props) {
-  // Obtener divisiones únicas
+  // Obtener divisiones únicas - AHORA MUCHO MÁS SIMPLE
   const divisions = Array.from(
-    new Set(
-      teams.flatMap(team => 
-        Array.isArray(team.divisions) 
-          ? team.divisions.map(d => d.name)
-          : team.divisions 
-          ? [team.divisions.name]
-          : []
-      )
-    )
+    new Set(teams.flatMap(team => team.divisions.map(d => d.name)))
   ).sort()
 
   const [selectedDivision, setSelectedDivision] = useState<string>(divisions[0] || "")
   const [selectedTeam, setSelectedTeam] = useState<TeamWithRelations | null>(null)
 
-  // Filtrar equipos por división
-  const filteredTeams = teams.filter(team => {
-    if (!team.divisions) return false
-
-    const divisionNames = Array.isArray(team.divisions)
-      ? team.divisions.map(d => d.name)
-      : [team.divisions.name]
-
-    return divisionNames.includes(selectedDivision)
-  })
+  // Filtrar equipos por división - SIMPLIFICADO
+  const filteredTeams = teams.filter(team =>
+    team.divisions.some(d => d.name === selectedDivision)
+  )
 
   // Información de la división seleccionada
   const getDivisionInfo = (divisionName: string) => {
