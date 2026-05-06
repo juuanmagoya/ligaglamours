@@ -39,7 +39,7 @@ export function Modal({ title, children, trigger }: Props) {
               </div>
 
               {/* Content */}
-              <div className="p-6 overflow-y-auto flex-1">
+              <div className="p-6 overflow-y-auto flex-1 text-black">
                 {children(() => setOpen(false))}
               </div>
             </div>

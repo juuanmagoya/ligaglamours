@@ -1,3 +1,4 @@
+// Type base (NO tocar)
 export type Position = {
   id: string
 
@@ -14,6 +15,7 @@ export type Position = {
   updated_at: string
 }
 
+// DTOs (tampoco se tocan)
 export type CreatePositionDTO = {
   team_id: string
   division_id: string
@@ -23,4 +25,14 @@ export type UpdatePositionDTO = {
   wins?: number
   draws?: number
   losses?: number
+}
+
+// ✅ Type para la parte pública (con relaciones)
+export type PositionWithRelations = Position & {
+  teams: {
+    name: string
+  }
+  divisions: {
+    name: string
+  }
 }
