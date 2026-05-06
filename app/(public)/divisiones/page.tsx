@@ -1,3 +1,4 @@
+import { Navbar } from "@/features/public/home/components/navbar"
 import { getPositions } from "@/features/posiciones/services/position.service"
 import { DivisionsView } from "@/features/public/divisiones/components/divisions-view"
 import { PositionWithRelations } from "@/features/posiciones/types/position.type"
@@ -11,5 +12,10 @@ export default async function DivisionesPage() {
     console.error("Error fetching positions:", error)
   }
 
-  return <DivisionsView positions={positions} />
+  return (
+    <>
+      <Navbar />
+      <DivisionsView positions={positions} />
+    </>
+  )
 }

@@ -11,23 +11,36 @@ export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
 
+  const isHome = pathname === "/";
+
+  // 🔥 Links dinámicos según página
   const navLinks = [
     { label: "Inicio", href: "/" },
-    { label: "Información", href: "#about" },
-    { label: "Campeones", href: "#champions" },
-    { label: "Sponsors", href: "#sponsors" },
-    { label: "Divisiones", href: "/public/divisiones" },
+
+    // SOLO HOME
+    ...(isHome
+      ? [
+          { label: "Información", href: "#about" },
+          { label: "Campeones", href: "#champions" },
+          { label: "Sponsors", href: "#sponsors" },
+        ]
+      : []),
+
+    // SIEMPRE visibles
+    { label: "Divisiones", href: "/divisiones" },
+    { label: "Equipos", href: "/equipos" },
   ];
 
-  // Detectar scroll para cambiar estilo del navbar
+  // Detectar scroll SOLO en home
   useEffect(() => {
+    if (!isHome) return;
+
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
-      
+
       const sections = document.querySelectorAll<HTMLElement>("section[id]");
       const scrollY = window.scrollY;
 
-      // Para "Inicio"
       if (scrollY < 200) {
         setActiveSection("");
       }
@@ -45,7 +58,7 @@ export function Navbar() {
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [isHome]);
 
   const isActive = (href: string) => {
     if (href === "/") return pathname === "/" && activeSection === "";
@@ -53,12 +66,16 @@ export function Navbar() {
     return pathname.startsWith(href);
   };
 
-  const handleSmoothScroll = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-    if (href.startsWith("#")) {
+  const handleSmoothScroll = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    href: string
+  ) => {
+    if (href.startsWith("#") && isHome) {
       e.preventDefault();
       const element = document.querySelector(href);
       if (element) {
-        const offsetTop = element.getBoundingClientRect().top + window.scrollY - 100;
+        const offsetTop =
+          element.getBoundingClientRect().top + window.scrollY - 100;
         window.scrollTo({ top: offsetTop, behavior: "smooth" });
         setOpen(false);
       }
@@ -75,19 +92,18 @@ export function Navbar() {
     >
       <div className="container mx-auto px-4 md:px-6">
         <div className="flex justify-between items-center h-20">
-          {/* LOGO con efecto 3D y glow */}
+          
+          {/* LOGO */}
           <Link
             href="/"
             className="group relative flex items-center gap-3 transition-all duration-300 hover:scale-105"
           >
-            {/* Glow detrás del logo */}
             <div className="absolute -inset-2 bg-linear-to-r from-purple-500/20 to-cyan-400/20 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             
             <div className="relative">
               <div className="w-12 h-12 rounded-xl bg-linear-to-br from-purple-500 via-pink-500 to-cyan-400 flex items-center justify-center shadow-lg transition-all duration-300 group-hover:scale-110 group-hover:rotate-6">
                 <Crown className="text-white w-6 h-6" />
               </div>
-              {/* Efecto de pulso */}
               <div className="absolute inset-0 rounded-xl bg-linear-to-br from-purple-500 to-cyan-400 opacity-0 group-hover:opacity-40 blur-lg transition-opacity duration-500 animate-pulse" />
             </div>
 
@@ -104,7 +120,7 @@ export function Navbar() {
             </div>
           </Link>
 
-          {/* DESKTOP NAVIGATION */}
+          {/* DESKTOP */}
           <div className="hidden md:flex items-center gap-1 lg:gap-2">
             {navLinks.map((link) => (
               <Link
@@ -117,36 +133,16 @@ export function Navbar() {
                     : "text-white/60 hover:text-white"
                 }`}
               >
-                {/* Texto del link */}
                 <span className="relative z-10">{link.label}</span>
 
-                {/* Subrayado gradiente turquesa - morado */}
                 <span
                   className={`absolute left-1/2 -translate-x-1/2 bottom-0 h-2px rounded-full
                     bg-linear-to-r from-cyan-400 via-purple-500 to-pink-500
-                    transition-all duration-500 ease-out
+                    transition-all duration-500
                     ${
                       isActive(link.href)
                         ? "w-[80%] opacity-100"
                         : "w-0 opacity-0 group-hover:w-[80%] group-hover:opacity-100"
-                    }`}
-                />
-
-                {/* Efecto de glow en el subrayado activo */}
-                {isActive(link.href) && (
-                  <>
-                    <span className="absolute left-1/2 -translate-x-1/2 bottom-0 w-[80%] h-2px bg-cyan-400 blur-sm opacity-50" />
-                    <span className="absolute -inset-x-2 -inset-y-1 bg-linear-to-r from-cyan-400/10 via-purple-500/10 to-pink-500/10 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  </>
-                )}
-
-                {/* Indicador de hover con gradiente */}
-                <span
-                  className={`absolute inset-0 rounded-xl bg-linear-to-r from-cyan-400/5 via-purple-500/5 to-pink-500/5 
-                    transition-all duration-300 ${
-                      isActive(link.href)
-                        ? "opacity-100"
-                        : "opacity-0 group-hover:opacity-100"
                     }`}
                 />
               </Link>
@@ -156,29 +152,25 @@ export function Navbar() {
           {/* MOBILE BUTTON */}
           <button
             onClick={() => setOpen(!open)}
-            className="md:hidden relative p-2 rounded-xl bg-white/5 hover:bg-white/10 transition-all duration-300 group"
+            className="md:hidden p-2 rounded-xl bg-white/5 hover:bg-white/10"
           >
-            <div className="relative z-10">
-              {open ? (
-                <X className="text-white w-5 h-5" />
-              ) : (
-                <Menu className="text-white w-5 h-5" />
-              )}
-            </div>
-            {/* Efecto de glow en el botón móvil */}
-            <div className="absolute inset-0 rounded-xl bg-linear-to-r from-purple-500/20 to-cyan-400/20 blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            {open ? (
+              <X className="text-white w-5 h-5" />
+            ) : (
+              <Menu className="text-white w-5 h-5" />
+            )}
           </button>
         </div>
 
-        {/* MOBILE MENU - Moderno con animaciones */}
+        {/* MOBILE MENU */}
         <div
-          className={`md:hidden overflow-hidden transition-all duration-500 ease-in-out ${
+          className={`md:hidden overflow-hidden transition-all duration-500 ${
             open ? "max-h-500px opacity-100" : "max-h-0 opacity-0"
           }`}
         >
           <div className="py-4">
-            <div className="rounded-2xl p-2 space-y-1 bg-linear-to-br from-[#120b1f]/95 to-[#0a0615]/95 backdrop-blur-xl border border-purple-500/20 shadow-2xl">
-              {navLinks.map((link, index) => (
+            <div className="rounded-2xl p-2 space-y-1 bg-[#120b1f]/95 border border-purple-500/20">
+              {navLinks.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
@@ -186,37 +178,18 @@ export function Navbar() {
                     handleSmoothScroll(e, link.href);
                     setOpen(false);
                   }}
-                  className={`group relative flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-300 overflow-hidden ${
+                  className={`flex items-center justify-between px-4 py-3 rounded-xl ${
                     isActive(link.href)
-                      ? "bg-linear-to-r from-purple-500/20 to-cyan-400/20 text-white"
+                      ? "bg-purple-500/20 text-white"
                       : "text-white/70 hover:bg-white/5"
                   }`}
                 >
-                  {/* Efecto de glow al hover */}
-                  <div className="absolute inset-0 bg-linear-to-r from-purple-500/10 to-cyan-400/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  
-                  <span className="relative z-10 font-medium">{link.label}</span>
-                  
+                  <span>{link.label}</span>
                   {isActive(link.href) && (
-                    <ChevronRight className="relative z-10 w-4 h-4 text-cyan-400 group-hover:translate-x-1 transition-transform duration-300" />
-                  )}
-                  
-                  {/* Indicador de subrayado gradiente para móvil */}
-                  {isActive(link.href) && (
-                    <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 rounded-full bg-linear-to-b from-cyan-400 via-purple-500 to-pink-500" />
+                    <ChevronRight className="w-4 h-4 text-cyan-400" />
                   )}
                 </Link>
               ))}
-
-              {/* Información adicional en móvil */}
-              <div className="pt-4 mt-2 border-t border-purple-500/20">
-                <div className="px-4 py-2">
-                  <p className="text-white/30 text-xs text-center">
-                    <Crown className="inline w-3 h-3 mr-1" />
-                    Liga Glamour - Gaming Competitivo 
-                  </p>
-                </div>
-              </div>
             </div>
           </div>
         </div>
