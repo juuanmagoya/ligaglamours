@@ -2,7 +2,8 @@ import { supabase } from "@/lib/supabase/client"
 import {
   Position,
   CreatePositionDTO,
-  UpdatePositionDTO
+  UpdatePositionDTO,
+  PositionWithRelations
 } from "../types/position.type"
 
 function calculatePlayed(
@@ -20,7 +21,8 @@ function calculatePoints(
   return wins * 3 + draws
 }
 
-export async function getPositions(): Promise<Position[]> {
+// 🔥 CORREGIDO: ahora devuelve relaciones
+export async function getPositions(): Promise<PositionWithRelations[]> {
 
   const { data, error } = await supabase
     .from("table_positions")
@@ -35,9 +37,10 @@ export async function getPositions(): Promise<Position[]> {
     throw new Error(error.message)
   }
 
-  return data as Position[]
+  return data as PositionWithRelations[]
 }
 
+// ✅ CRUD intacto (NO se toca)
 export async function createPosition(data: CreatePositionDTO) {
 
   const { error } = await supabase
@@ -88,7 +91,6 @@ export async function updatePosition(
   if (error) {
     throw new Error(error.message)
   }
-
 }
 
 export async function deletePosition(id: string) {
@@ -101,5 +103,4 @@ export async function deletePosition(id: string) {
   if (error) {
     throw new Error(error.message)
   }
-
 }
