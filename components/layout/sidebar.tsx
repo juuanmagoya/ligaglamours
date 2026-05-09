@@ -9,6 +9,7 @@ import {
   X,
   LogOut,
   Users,
+  UserCircle, // 👈 Agrega este icono
 } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
 
@@ -32,7 +33,6 @@ export default function Sidebar({
         : "text-gray-300 hover:bg-purple-700 hover:text-white"
     }`;
 
-  // 🔥 MENÚS
   const adminLinks = [
     { href: "/admin/dashboard", label: "Dashboard", icon: Home },
     { href: "/admin/equipos", label: "Equipos", icon: Shield },
@@ -47,7 +47,6 @@ export default function Sidebar({
     { href: "/lider/jugadores", label: "Mis Jugadores", icon: Users },
   ];
 
-  // 🔥 EVITA FALLBACK INCORRECTO
   const links =
     role === "admin"
       ? adminLinks
@@ -106,10 +105,14 @@ export default function Sidebar({
               ? "..."
               : role || "rol"}
           </p>
+          {/* 👇 Agrega el email del usuario */}
+          <p className="text-xs text-purple-300/70 mt-1 truncate">
+            {session?.user?.email || ""}
+          </p>
         </div>
 
         {/* 🔗 NAV */}
-        <nav className="flex flex-col gap-2">
+        <nav className="flex flex-col gap-2 flex-1">
           {status === "loading" ? (
             <p className="text-gray-400 text-sm px-3">Cargando menú...</p>
           ) : (
@@ -130,9 +133,22 @@ export default function Sidebar({
           )}
         </nav>
 
+        {/* 👇 SECCIÓN DE CUENTA (NUEVA) */}
+        {status !== "loading" && (
+          <div className="mt-6 pt-4 border-t border-purple-700/50">
+            <Link
+              href="/admin/cuenta"
+              className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-300 hover:bg-purple-700 hover:text-white transition-colors"
+            >
+              <UserCircle size={18} />
+              Mi Cuenta
+            </Link>
+          </div>
+        )}
+
         {/* 🚪 LOGOUT */}
         {status !== "loading" && (
-          <div className="mt-10">
+          <div className="mt-2">
             <button
               onClick={() => signOut({ callbackUrl: "/login" })}
               className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-red-400 hover:bg-red-600 hover:text-white transition-colors"
