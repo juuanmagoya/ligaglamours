@@ -3,6 +3,9 @@ import { getPositions } from "@/features/posiciones/services/position.service"
 import { DivisionsView } from "@/features/public/divisiones/components/divisions-view"
 import { PositionWithRelations } from "@/features/posiciones/types/position.type"
 
+// 🔥 Agrega esto - Revalida cada 60 segundos
+export const revalidate = 60
+
 export default async function DivisionesPage() {
   let positions: PositionWithRelations[] = []
 
