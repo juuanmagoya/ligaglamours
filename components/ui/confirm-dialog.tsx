@@ -57,7 +57,7 @@ export function ConfirmDialog({
 
               <button
                 onClick={() => setOpen(false)}
-                className="px-4 py-2 text-sm rounded-md border border-gray-300 hover:bg-gray-100"
+                className="px-4 py-2 text-sm rounded-md border text-black border-gray-300 hover:bg-gray-100"
               >
                 Cancelar
               </button>

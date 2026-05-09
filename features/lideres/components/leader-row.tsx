@@ -119,6 +119,7 @@ export function LeaderRow({ leader, teams }: Props) {
             <Button
               size="sm"
               variant="outline"
+              className="text-black"
             >
               {toggleText}
             </Button>
