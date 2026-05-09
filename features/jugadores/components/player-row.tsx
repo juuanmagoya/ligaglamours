@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
+import { useMemo } from "react" // Solo importamos useMemo
 
 import { Player } from "../types/player.type"
 
@@ -14,7 +15,12 @@ import { PlayerForm } from "./player-form"
 import { deletePlayerAction } from "../actions/delete-player"
 
 type Props = {
-  player: Player
+  player: Player & {
+    teams?: {
+      id: string
+      name: string
+    }
+  }
   teams: { id: string; name: string }[]
   user: {
     role: "admin" | "leader"
@@ -23,7 +29,6 @@ type Props = {
 }
 
 export function PlayerRow({ player, teams, user }: Props) {
-
   const router = useRouter()
 
   async function handleDelete() {
@@ -36,41 +41,66 @@ export function PlayerRow({ player, teams, user }: Props) {
     }
   }
 
-  const teamName =
-    teams.find((t) => t.id === player.team_id)?.name ?? "—"
+  // ✅ Calcular la inicial DURANTE el renderizado (no en un efecto)
+  const initial = useMemo(() => {
+    if (!player.nickname || player.nickname.trim() === "") {
+      return "?"
+    }
+    const firstChar = player.nickname.trim().charAt(0)
+    // Verificar si es una letra (A-Z, a-z)
+    if (/[A-Za-z]/.test(firstChar)) {
+      return firstChar.toUpperCase()
+    }
+    return "?"
+  }, [player.nickname]) // useMemo es para optimizar, no es obligatorio
+
+  // Alternativa aún más simple (sin useMemo):
+  // const initial = (() => {
+  //   if (!player.nickname || player.nickname.trim() === "") return "?"
+  //   const firstChar = player.nickname.trim().charAt(0)
+  //   return /[A-Za-z]/.test(firstChar) ? firstChar.toUpperCase() : "?"
+  // })()
+
+  const teamName = player.teams?.name ?? teams.find((t) => t.id === player.team_id)?.name ?? "—"
 
   return (
-    <tr className="border-t border-purple-100 hover:bg-purple-50 transition">
-
+    <tr className="border-b border-purple-500/10 hover:bg-purple-500/5 transition-colors duration-200 group">
+      
       {/* Nickname */}
-      <td className="p-4 font-medium text-gray-800">
-        {player.nickname}
+      <td className="px-4 py-3">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-linear-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center text-sm font-bold text-purple-400">
+            {initial}
+          </div>
+          <span className="font-medium text-white group-hover:text-purple-300 transition-colors">
+            {player.nickname || "Sin nombre"}
+          </span>
+        </div>
       </td>
 
       {/* ID Game */}
-      <td className="p-4 text-gray-600">
-        {player.id_game}
+      <td className="px-4 py-3">
+        <code className="text-xs text-white/60 font-mono bg-white/5 px-2 py-1 rounded-md">
+          {player.id_game || "No registrado"}
+        </code>
       </td>
 
       {/* Equipo */}
-      <td className="p-4 text-gray-600 hidden md:table-cell">
-        {teamName}
+      <td className="px-4 py-3">
+        <span className="text-white/70 text-sm">
+          {teamName}
+        </span>
       </td>
 
       {/* Acciones */}
-      <td className="p-4">
+      <td className="px-4 py-3">
         <div className="flex items-center gap-2">
-
-          {/* Editar */}
-          <Modal
-            title="Editar jugador"
-            trigger={<EditButton />}
-          >
+          <Modal title="Editar jugador" trigger={<EditButton />}>
             {(close) => (
               <PlayerForm
                 player={player}
                 teams={teams}
-                user={user} // 🔥 CLAVE
+                user={user}
                 onSuccess={() => {
                   close()
                   router.refresh()
@@ -79,15 +109,13 @@ export function PlayerRow({ player, teams, user }: Props) {
             )}
           </Modal>
 
-          {/* Eliminar */}
           <ConfirmDialog
             title="Eliminar jugador"
-            description="Esta acción no se puede deshacer"
+            description="Esta acción no se puede deshacer. El jugador será eliminado permanentemente."
             onConfirm={handleDelete}
           >
             <DeleteButton />
           </ConfirmDialog>
-
         </div>
       </td>
 

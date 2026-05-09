@@ -1,17 +1,68 @@
+// features/jugadores/services/player.service.ts
 import { supabase } from "@/lib/supabase/client"
 import { Player, CreatePlayerDTO, UpdatePlayerDTO } from "../types/player.type"
 import { canModifyPlayers } from "@/lib/auth/permissions"
 import { AppUser } from "@/features/users/types/user.types"
 
-// ✅ GET PLAYERS SEGÚN ROL
-export async function getPlayers(user: AppUser): Promise<Player[]> {
-
+// ✅ GET PLAYERS CON FILTROS (solo nickname, id_game, team_id)
+export async function getPlayers(
+  user: AppUser,
+  filters?: {
+    search?: string
+    teamId?: string
+  }
+): Promise<Player[]> {
+  
   let query = supabase
     .from("players")
-    .select("*")
-    .order("created_at", { ascending: false })
+    .select(`
+      *,
+      teams (
+        id,
+        name
+      )
+    `)
+    .order("nickname", { ascending: true })
 
   // 🔒 Si es líder → solo ve los suyos
+  if (user.role === "leader") {
+    query = query.eq("team_id", user.team_id!)
+  }
+
+  // 🔍 Búsqueda por nickname o ID de juego
+  if (filters?.search && filters.search.trim() !== "") {
+    const searchTerm = `%${filters.search.trim()}%`
+    query = query.or(`nickname.ilike.${searchTerm},id_game.ilike.${searchTerm}`)
+  }
+
+  // 🏢 Filtrar por equipo específico
+  if (filters?.teamId && filters.teamId !== "all") {
+    query = query.eq("team_id", filters.teamId)
+  }
+
+  const { data, error } = await query
+
+  if (error) {
+    console.error("Error en getPlayers:", error)
+    throw new Error(error.message)
+  }
+
+  return data as Player[]
+}
+
+// ✅ GET ALL PLAYERS (sin filtros)
+export async function getAllPlayers(user: AppUser): Promise<Player[]> {
+  let query = supabase
+    .from("players")
+    .select(`
+      *,
+      teams (
+        id,
+        name
+      )
+    `)
+    .order("nickname", { ascending: true })
+
   if (user.role === "leader") {
     query = query.eq("team_id", user.team_id!)
   }
@@ -19,20 +70,18 @@ export async function getPlayers(user: AppUser): Promise<Player[]> {
   const { data, error } = await query
 
   if (error) {
+    console.error("Error en getAllPlayers:", error)
     throw new Error(error.message)
   }
 
   return data as Player[]
 }
 
-
 // ✅ CREATE PLAYER
 export async function createPlayer(
   data: CreatePlayerDTO,
   user: AppUser
 ) {
-
-  // 🔒 Leader no elige team
   if (user.role === "leader") {
     data.team_id = user.team_id!
   }
@@ -50,14 +99,12 @@ export async function createPlayer(
   }
 }
 
-
 // ✅ UPDATE PLAYER
 export async function updatePlayer(
   id: string,
   data: UpdatePlayerDTO,
   user: AppUser
 ) {
-
   const { data: existing, error: fetchError } = await supabase
     .from("players")
     .select("team_id")
@@ -68,7 +115,6 @@ export async function updatePlayer(
     throw new Error("Jugador no encontrado")
   }
 
-  // 🔒 líder no puede cambiar de equipo
   if (user.role === "leader") {
     data.team_id = existing.team_id
   }
@@ -87,13 +133,11 @@ export async function updatePlayer(
   }
 }
 
-
 // ✅ DELETE PLAYER
 export async function deletePlayer(
   id: string,
   user: AppUser
 ) {
-
   const { data: existing, error: fetchError } = await supabase
     .from("players")
     .select("team_id")
