@@ -10,12 +10,34 @@ type DivisionsViewProps = {
   positions: PositionWithRelations[]
 }
 
+// Función para ordenar divisiones en el orden correcto
+const sortDivisionsByOrder = (divisions: string[]): string[] => {
+  // Definimos el orden que queremos
+  const order = ["Primera", "Segunda", "Tercera", "Cuarta", "Quinta"]
+  
+  // Ordenar según el array 'order'
+  return [...divisions].sort((a, b) => {
+    const indexA = order.findIndex(o => a.includes(o))
+    const indexB = order.findIndex(o => b.includes(o))
+    
+    // Si ambas están en el orden, ordenar por índice
+    if (indexA !== -1 && indexB !== -1) {
+      return indexA - indexB
+    }
+    // Si solo una está en el orden, la que está en el orden va primero
+    if (indexA !== -1) return -1
+    if (indexB !== -1) return 1
+    // Si ninguna está en el orden, ordenar alfabéticamente
+    return a.localeCompare(b)
+  })
+}
+
 export function DivisionsView({ positions }: DivisionsViewProps) {
 
-  // Divisiones únicas
-  const divisions = [
+  // Divisiones únicas y ordenadas
+  const divisions = sortDivisionsByOrder([
     ...new Set(positions.map((p) => p.divisions.name))
-  ]
+  ])
 
   const [selected, setSelected] = useState<string>(divisions[0] ?? "")
 

@@ -5,7 +5,7 @@ export async function getDivisions(): Promise<Division[]> {
   const { data, error } = await supabase
     .from("divisions")
     .select("*")
-    .order("created_at", { ascending: false })
+    .order("id", { ascending: true }) // ← Cambiado: ordenar por ID
 
   if (error) {
     throw new Error(error.message)
