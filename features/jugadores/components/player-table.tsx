@@ -27,21 +27,22 @@ export function PlayerTable({ players, teams, user }: Props) {
   }
 
   return (
-    <div className="rounded-xl border border-purple-500/20 bg-[#1a1029]/30 backdrop-blur overflow-hidden">
+    <div className="rounded-xl border border-purple-500/20 bg-[#1a1029]/30 backdrop-blur-sm overflow-hidden">
+      {/* Scroll horizontal solo para móvil */}
       <div className="overflow-x-auto">
-        <table className="w-full text-sm">
+        <table className="w-full text-sm min-w-500px md:min-w-0">
           <thead className="bg-purple-500/10 border-b border-purple-500/20">
             <tr>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-purple-300">
+              <th className="px-3 sm:px-4 py-3 text-left text-xs font-semibold text-purple-300">
                 Nickname
               </th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-purple-300">
+              <th className="px-3 sm:px-4 py-3 text-left text-xs font-semibold text-purple-300 hidden sm:table-cell">
                 ID Game
               </th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-purple-300">
+              <th className="px-3 sm:px-4 py-3 text-left text-xs font-semibold text-purple-300 hidden md:table-cell">
                 Equipo
               </th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-purple-300">
+              <th className="px-3 sm:px-4 py-3 text-left text-xs font-semibold text-purple-300">
                 Acciones
               </th>
             </tr>
