@@ -1,24 +1,22 @@
-"use client"
+"use client";
 
-import Link from "next/link"
+import Link from "next/link";
 
 export function HeroSection() {
   return (
-    <section className="relative min-h-[90vh] flex items-center overflow-hidden">
-
+    <section className="relative min-h-screen pt-20 flex items-center overflow-hidden">
       {/* overlay */}
       <div className="absolute inset-0 bg-linear-to-b from-transparent via-[#0a0615]/50 to-[#0a0615]" />
 
       <div className="container mx-auto px-4 md:px-6 relative z-10">
         <div className="max-w-4xl mx-auto text-center">
-
           {/* badge */}
           <div className="inline-flex items-center gap-2 bg-[#1a1029]/50 backdrop-blur px-6 py-3 rounded-full mb-8">
-            <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+            <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
             <span className="text-sm font-semibold tracking-wider text-cyan-400">
-              TEMPORADA 2026
+              TEMPORADA 10
             </span>
-            <span className="w-2 h-2 rounded-full bg-purple-500 animate-pulse"></span>
+            <span className="w-2 h-2 rounded-full bg-purple-500 animate-pulse" />
           </div>
 
           {/* title */}
@@ -30,9 +28,7 @@ export function HeroSection() {
           {/* description */}
           <p className="text-xl md:text-2xl text-white/70 mb-10 max-w-2xl mx-auto">
             La competición más prestigiosa de{" "}
-            <span className="text-cyan-400 font-semibold">
-              Mobile Legends
-            </span>{" "}
+            <span className="text-cyan-400 font-semibold">Mobile Legends</span>{" "}
             en Argentina. Donde los mejores equipos luchan por la gloria.
           </p>
 
@@ -51,9 +47,7 @@ export function HeroSection() {
                 <div className="text-3xl font-bold text-purple-400">
                   {stat.value}
                 </div>
-                <div className="text-sm text-white/60">
-                  {stat.label}
-                </div>
+              <div className="text-sm text-white/60">{stat.label}</div>
               </div>
             ))}
           </div>
@@ -77,5 +71,5 @@ export function HeroSection() {
         </div>
       </div>
     </section>
-  )
+  );
 }

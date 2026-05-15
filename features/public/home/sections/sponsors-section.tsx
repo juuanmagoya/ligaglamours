@@ -29,8 +29,8 @@ export function SponsorsSection() {
     },
     {
       icon: <Award className="w-6 h-6" />,
-      title: "Branding Premium",
-      description: "Logos en transmisiones, redes sociales y eventos en vivo"
+      title: "Visibilidad Redes Sociales",
+      description: "Promoción en nuestras plataformas con contenido exclusivo para tu marca"
     },
     {
       icon: <Heart className="w-6 h-6" />,
