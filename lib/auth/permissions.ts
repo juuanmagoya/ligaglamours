@@ -103,7 +103,7 @@ export function isWeekend(): boolean {
 
   const day = argentinaDate.getDay()
 
-  const result = day === 0 || day === 6
+  const result = day === 0 || day === 6 || day === 5  // 0 = domingo, 6 = sábado, 5 = viernes
 
   console.log("📅 isWeekend", {
     serverDate: now,
