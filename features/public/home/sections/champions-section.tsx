@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useState } from "react";
-import { Crown, Trophy, Star, Flame, Shield} from "lucide-react";
+import { Crown, Trophy, Star, Flame, Shield, Minus } from "lucide-react";
 
 // Tipos para los campeones
 interface Champion {
@@ -15,70 +15,70 @@ interface Champion {
   stats: {
     wins: number;
     losses: number;
-    winRate: number;
+    draws: number; // Añadido empates
+    totalGames: number; // Total de partidos (calculado automáticamente)
+    winRate: number; // Porcentaje de victorias (calculado automáticamente)
   };
   achievements: string[];
 }
 
+// Función para calcular estadísticas automáticamente
+const calculateStats = (wins: number, losses: number, draws: number) => {
+  const totalGames = wins + losses + draws;
+  const winRate = totalGames > 0 ? Number(((wins / totalGames) * 100).toFixed(1)) : 0;
+  
+  return {
+    wins,
+    losses,
+    draws,
+    totalGames,
+    winRate,
+  };
+};
+
 export function ChampionsSection() {
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
 
-  // Campeones de las 4 divisiones (liga)
+  // Campeones de las 4 divisiones (liga) - Ahora con empates
   const leagueChampions: Champion[] = [
     {
       id: 1,
-      team: "Ashura Darkness",
+      team: "Kosmos Khaos",
       division: "Primera División",
       divisionLevel: 1,
       description: "Campeones absolutos de la máxima categoría con dominio total",
-      image: "/img/imgashura.jpeg",
-      stats: {
-        wins: 18,
-        losses: 2,
-        winRate: 90,
-      },
+      image: "/img/khaos.PNG",
+      stats: calculateStats(9, 0 , 2), // 9 victorias, 0 derrotas, 2 empates
       achievements: ["Triple Corona", "MVP de la temporada", "Mejor ofensiva"],
     },
     {
       id: 2,
-      team: "Phanteon's Black",
+      team: "Fenix Yokai",
       division: "Segunda División",
       divisionLevel: 2,
       description: "Campeones con ascenso directo a Primera División",
-      image: "/img/imgphanteonblack.jpeg",
-      stats: {
-        wins: 16,
-        losses: 4,
-        winRate: 80,
-      },
+      image: "/img/fenixyokai.jpeg",
+      stats: calculateStats(10, 0, 1), // 10 victorias, 0 derrotas, 1 empate
       achievements: ["Ascenso impecable", "Racha invicta", "Mejor defensiva"],
     },
     {
       id: 3,
-      team: "Phanteon's Wrath",
+      team: "Beastmode",
       division: "Tercera División",
       divisionLevel: 3,
       description: "Campeones invictos demostrando superioridad absoluta",
-      image: "/img/imgphanteonwrath.jpeg",
-      stats: {
-        wins: 20,
-        losses: 0,
-        winRate: 100,
-      },
+      image: "/img/Beastmode.png",
+      stats: calculateStats(10, 1, 0), // 10 victorias, 1 derrota, 0 empates
       achievements: ["Temporada perfecta", "Sin derrotas", "Récord histórico"],
     },
     {
       id: 4,
-      team: "Dragons Legacy",
+      team: "Harakiri Sochi",
       division: "Cuarta División",
       divisionLevel: 4,
       description: "Los campeones que iniciaron su legado desde abajo",
-      image: "/img/imgdragonslegacy.jpeg",
-      stats: {
-        wins: 15,
-        losses: 5,
-        winRate: 75,
-      },
+      image: "/img/harakiri.jpeg",
+      stats: calculateStats(8, 0, 1), // 8 victorias, 0 derrotas, 1 empate
       achievements: ["Mayor remontada", "Equipo revelación", "Futuro prometedor"],
     },
   ];
@@ -87,8 +87,8 @@ export function ChampionsSection() {
   const tournamentChampion = {
     team: "Octa Gaming",
     tournament: "Torneo Oficial 5vs5",
-    description: "Dominó la competencia con estrategia impecable, invicto durante toda la temporada",
-    image: "/img/logo-octa.png",
+    description: "Dominó la competencia con estrategia impecable, invicto durante todo el Torneo Oficial 5vs5, demostrando ser el mejor equipo en formato eliminación directa",
+    image: "/img/octa.png",
   };
 
   // Colores según división
@@ -100,6 +100,26 @@ export function ChampionsSection() {
       4: { bg: "from-blue-600/20 to-blue-700/20", border: "border-blue-500/30", gradient: "from-blue-500 to-blue-600", badge: "bg-linear-to-r from-blue-500 to-blue-600" },
     };
     return colors[level as keyof typeof colors] || colors[1];
+  };
+
+  // Función para obtener color según tipo de estadística
+  const getStatColor = (type: 'wins' | 'draws' | 'losses') => {
+    switch(type) {
+      case 'wins': return 'text-green-400';
+      case 'draws': return 'text-yellow-400';
+      case 'losses': return 'text-red-400';
+      default: return 'text-white';
+    }
+  };
+
+  // Función para obtener ícono según tipo de estadística
+  const getStatIcon = (type: 'wins' | 'draws' | 'losses') => {
+    switch(type) {
+      case 'wins': return <Trophy className="w-3 h-3" />;
+      case 'draws': return <Minus className="w-3 h-3" />;
+      case 'losses': return <Flame className="w-3 h-3" />;
+      default: return null;
+    }
   };
 
   return (
@@ -114,7 +134,7 @@ export function ChampionsSection() {
         <div className="text-center max-w-4xl mx-auto mb-16 animate-fade-in-up">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-linear-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 mb-6 backdrop-blur-sm">
             <Trophy className="w-4 h-4 text-yellow-400" />
-            <span className="text-sm font-semibold text-purple-300">TEMPORADA 2024</span>
+            <span className="text-sm font-semibold text-purple-300">TEMPORADA 9</span>
             <Flame className="w-4 h-4 text-orange-400" />
           </div>
 
@@ -178,24 +198,41 @@ export function ChampionsSection() {
                     </div>
                   </div>
 
-                  {/* Stats flotantes en hover */}
+                  {/* Stats flotantes en hover - Ahora con empates */}
                   <div className={`absolute bottom-4 left-4 right-4 transition-all duration-500 ${
                     hoveredCard === champion.id ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
                   }`}>
                     <div className="bg-black/60 backdrop-blur rounded-lg p-3">
-                      <div className="grid grid-cols-3 gap-2 text-center">
+                      <div className="grid grid-cols-4 gap-2 text-center">
                         <div>
-                          <div className="text-yellow-400 font-bold text-sm">{champion.stats.wins}</div>
+                          <div className="flex items-center justify-center gap-1 text-green-400 font-bold text-sm">
+                            {getStatIcon('wins')}
+                            {champion.stats.wins}
+                          </div>
                           <div className="text-white/60 text-xs">Victorias</div>
                         </div>
                         <div>
-                          <div className="text-red-400 font-bold text-sm">{champion.stats.losses}</div>
+                          <div className="flex items-center justify-center gap-1 text-yellow-400 font-bold text-sm">
+                            {getStatIcon('draws')}
+                            {champion.stats.draws}
+                          </div>
+                          <div className="text-white/60 text-xs">Empates</div>
+                        </div>
+                        <div>
+                          <div className="flex items-center justify-center gap-1 text-red-400 font-bold text-sm">
+                            {getStatIcon('losses')}
+                            {champion.stats.losses}
+                          </div>
                           <div className="text-white/60 text-xs">Derrotas</div>
                         </div>
                         <div>
-                          <div className="text-green-400 font-bold text-sm">{champion.stats.winRate}%</div>
+                          <div className="text-cyan-400 font-bold text-sm">{champion.stats.winRate}%</div>
                           <div className="text-white/60 text-xs">Win Rate</div>
                         </div>
+                      </div>
+                      {/* Total de partidos */}
+                      <div className="text-center mt-2 pt-2 border-t border-white/10">
+                        <span className="text-white/40 text-xs">Total: {champion.stats.totalGames} partidos</span>
                       </div>
                     </div>
                   </div>
@@ -306,8 +343,6 @@ export function ChampionsSection() {
                   <p className="text-white/80 text-lg mb-6 max-w-xl">
                     {tournamentChampion.description}
                   </p>
-
-
                 </div>
               </div>
             </div>
