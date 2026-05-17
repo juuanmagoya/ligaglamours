@@ -27,7 +27,7 @@ type Props = {
 
 function isWeekend() {
   const day = new Date().getDay()
-  return day === 0 || day === 6 || day === 5 // 0 = domingo, 6 = sábado, 5 = viernes
+  return day === 0 || day === 6 || day === 5 || day === 1 || day === 2 // 0 = domingo, 6 = sábado, 5 = viernes, 1 = lunes, 2 = martes
 }
 
 export function PlayerForm({ player, teams, user, onSuccess }: Props) {

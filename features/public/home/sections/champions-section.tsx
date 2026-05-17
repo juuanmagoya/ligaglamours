@@ -49,7 +49,7 @@ export function ChampionsSection() {
       description: "Campeones absolutos de la máxima categoría con dominio total",
       image: "/img/khaos.PNG",
       stats: calculateStats(9, 0 , 2), // 9 victorias, 0 derrotas, 2 empates
-      achievements: ["Triple Corona", "MVP de la temporada", "Mejor ofensiva"],
+      achievements: ["Juego Agresivo", "MVP de la temporada", "Equipo Revelación"],
     },
     {
       id: 2,
@@ -59,7 +59,7 @@ export function ChampionsSection() {
       description: "Campeones con ascenso directo a Primera División",
       image: "/img/fenixyokai.jpeg",
       stats: calculateStats(10, 0, 1), // 10 victorias, 0 derrotas, 1 empate
-      achievements: ["Ascenso impecable", "Racha invicta", "Mejor defensiva"],
+      achievements: ["Ascenso Imparable", "Precisión Total", "Fuerza Estratégica"],
     },
     {
       id: 3,
@@ -69,7 +69,7 @@ export function ChampionsSection() {
       description: "Campeones invictos demostrando superioridad absoluta",
       image: "/img/Beastmode.png",
       stats: calculateStats(10, 1, 0), // 10 victorias, 1 derrota, 0 empates
-      achievements: ["Temporada perfecta", "Sin derrotas", "Récord histórico"],
+      achievements: ["Vivctoria Legendaria", "Dominio Absoluto", "Imparables"],
     },
     {
       id: 4,
@@ -79,7 +79,7 @@ export function ChampionsSection() {
       description: "Los campeones que iniciaron su legado desde abajo",
       image: "/img/harakiri.jpeg",
       stats: calculateStats(8, 0, 1), // 8 victorias, 0 derrotas, 1 empate
-      achievements: ["Mayor remontada", "Equipo revelación", "Futuro prometedor"],
+      achievements: ["Honor Absoluto", "Legado Eterno", "Fuerza Renacida"],
     },
   ];
 
@@ -134,7 +134,7 @@ export function ChampionsSection() {
         <div className="text-center max-w-4xl mx-auto mb-16 animate-fade-in-up">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-linear-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 mb-6 backdrop-blur-sm">
             <Trophy className="w-4 h-4 text-yellow-400" />
-            <span className="text-sm font-semibold text-purple-300">TEMPORADA 9</span>
+            <span className="text-sm font-semibold text-purple-300">TEMPORADA 8</span>
             <Flame className="w-4 h-4 text-orange-400" />
           </div>
 
