@@ -14,7 +14,7 @@ export function HeroSection() {
           <div className="inline-flex items-center gap-2 bg-[#1a1029]/50 backdrop-blur px-6 py-3 rounded-full mb-8">
             <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
             <span className="text-sm font-semibold tracking-wider text-cyan-400">
-              TEMPORADA 10
+              TEMPORADA 9
             </span>
             <span className="w-2 h-2 rounded-full bg-purple-500 animate-pulse" />
           </div>
