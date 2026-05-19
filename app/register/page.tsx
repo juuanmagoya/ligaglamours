@@ -1,8 +1,8 @@
-import { supabase }
-from "@/lib/supabase/client"
+import { supabase } from "@/lib/supabase/client"
+import { RegisterLeaderForm } from "@/features/auth/components/register-leader-form"
 
-import { RegisterLeaderForm }
-from "@/features/auth/components/register-leader-form"
+// 🔥 Revalida cada 60 segundos
+export const revalidate = 60
 
 export default async function RegisterPage() {
 
