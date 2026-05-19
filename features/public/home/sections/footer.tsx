@@ -191,7 +191,7 @@ export function Footer() {
             </h4>
             <div className="space-y-3">
               <div className="bg-purple-500/10 rounded-xl p-3 border border-purple-500/20">
-                <p className="text-white/80 text-sm font-semibold">2026 - Temporada 10</p>
+                <p className="text-white/80 text-sm font-semibold">2026 - Temporada 9</p>
                 <p className="text-white/40 text-xs mt-1">En curso · 4 divisiones activas</p>
               </div>
               <div className="flex items-center gap-2 text-white/40 text-xs">
