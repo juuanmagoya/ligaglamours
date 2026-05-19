@@ -35,7 +35,7 @@ export function HeroSection() {
           {/* stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto mb-12">
             {[
-              { value: "48", label: "Equipos Activos" },
+              { value: "41", label: "Equipos Activos" },
               { value: "4", label: "Divisiones" },
               { value: "200+", label: "Jugadores" },
               { value: "$400K", label: "Premios" },
@@ -55,7 +55,7 @@ export function HeroSection() {
           {/* buttons */}
           <div className="flex flex-wrap justify-center gap-4">
             <Link
-              href="/public/divisiones"
+              href="/divisiones"
               className="px-8 py-4 rounded-full bg-linear-to-r from-purple-500 to-pink-500 font-bold hover:scale-105 transition"
             >
               Ver Divisiones →
