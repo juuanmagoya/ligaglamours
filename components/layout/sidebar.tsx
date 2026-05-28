@@ -40,6 +40,7 @@ export default function Sidebar({
     { href: "/admin/divisiones", label: "Divisiones", icon: Crown },
     { href: "/admin/jugadores", label: "Jugadores", icon: Users },
     { href: "/admin/posiciones", label: "Posiciones", icon: Crown },
+    { href: "/admin/fechas", label: "Fechas", icon: Crown },
   ];
 
   const leaderLinks = [
