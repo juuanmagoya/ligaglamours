@@ -9,7 +9,11 @@ import {
   X,
   LogOut,
   Users,
-  UserCircle, // 👈 Agrega este icono
+  Layers,
+  Trophy,
+  CalendarDays,
+  Swords,
+  UserCircle,
 } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
 
@@ -34,13 +38,53 @@ export default function Sidebar({
     }`;
 
   const adminLinks = [
-    { href: "/admin/dashboard", label: "Dashboard", icon: Home },
-    { href: "/admin/equipos", label: "Equipos", icon: Shield },
-    { href: "/admin/lideres", label: "Líderes", icon: Crown },
-    { href: "/admin/divisiones", label: "Divisiones", icon: Crown },
-    { href: "/admin/jugadores", label: "Jugadores", icon: Users },
-    { href: "/admin/posiciones", label: "Posiciones", icon: Crown },
-    { href: "/admin/fechas", label: "Fechas", icon: Crown },
+{
+  href: "/admin/dashboard",
+  label: "Dashboard",
+  icon: Home
+},
+
+{
+  href: "/admin/equipos",
+  label: "Equipos",
+  icon: Shield
+},
+
+{
+  href: "/admin/lideres",
+  label: "Líderes",
+  icon: Crown
+},
+
+{
+  href: "/admin/divisiones",
+  label: "Divisiones",
+  icon: Layers
+},
+
+{
+  href: "/admin/jugadores",
+  label: "Jugadores",
+  icon: Users
+},
+
+{
+  href: "/admin/posiciones",
+  label: "Posiciones",
+  icon: Trophy
+},
+
+{
+  href: "/admin/fechas",
+  label: "Fechas",
+  icon: CalendarDays
+},
+
+{
+  href: "/admin/enfrentamientos",
+  label: "Enfrentamientos",
+  icon: Swords
+}
   ];
 
   const leaderLinks = [
