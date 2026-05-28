@@ -8,7 +8,7 @@ import { getTeams } from "@/features/equipos/services/equipo.service"
 
 import { MatchesHeader } from "@/features/enfrentamientos/components/matches-header"
 
-import { MatchTable } from "@/features/enfrentamientos/components/match-table"
+import { MatchesGrouped } from "@/features/enfrentamientos/components/matches-grouped"
 
 import { getCurrentUser } from "@/lib/auth/getCurrentUser"
 
@@ -46,8 +46,9 @@ export default async function MatchesPage() {
         teams={teams}
       />
 
-      <MatchTable
+      <MatchesGrouped
         matches={matches}
+
         fechas={fechas}
         divisions={divisions}
         teams={teams}
