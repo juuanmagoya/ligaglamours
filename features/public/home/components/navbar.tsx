@@ -29,7 +29,7 @@ export function Navbar() {
     // SIEMPRE visibles
     { label: "Divisiones", href: "/divisiones" },
     { label: "Equipos", href: "/equipos" },
-    //{ label: "Enfrentamientos", href: "/enfrentamientos" },
+    { label: "Enfrentamientos", href: "/enfrentamientos" },
   ];
 
   // Detectar scroll SOLO en home
